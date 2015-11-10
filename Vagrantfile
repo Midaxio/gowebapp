@@ -18,7 +18,5 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     owner: "vagrant", group: "vagrant"
 
   config.vm.provision "file", source: "files/", destination: "/tmp/"
-  config.vm.provision "shell", inline: <<-SHELL
-    sudo dpkg -i /tmp/files/chefdk.deb
-  SHELL
+  config.vm.provision "shell", path: "scripts/install.sh"
 end 
