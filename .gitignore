@@ -1,6 +1,7 @@
 .vagrant/
 .vagrantup
 files/chefdk.deb
+aws-cred/
 
 .rake_test_cache
 
@@ -10,3 +11,6 @@ files/chefdk.deb
 .chef/*.pem
 .chef/encrypted_data_bag_secret
 
+/keyrings/live/pubring.gpg~
+/keyrings/live/pubring.kbx~
+/keyrings/live/secring.gpg
