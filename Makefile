@@ -35,16 +35,24 @@ endif
 
 .sshkey: .downloadblackbox
 ifeq ("$(wildcard files/id_rsa)","")
-	@echo Decrypting ssh key
-	PATH=$(PATH); blackbox_cat keys/sainsburys-test.gpg > files/id_rsa
+	@echo Moving ssh key
+	PATH=$(PATH); cp keys/sainsburys-test files/id_rsa
 else
 	@echo Key already decrypted
+endif
+
+.decryptfiles: .downloadblackbox
+ifeq ("$(wildcard aws-cred/credentials)","")
+	@echo Decrypting encrypted files
+	PATH=$(PATH); blackbox_decrypt_all_files
+else
+	@echo Files already decrypted
 endif
 
 ssh: vagrantup
 	vagrant ssh
 
-provision-ec2: vagrantup
+provision-ec2: vagrantup .decryptfiles
 	vagrant ssh -c "cd ~/workspace/provision && \
 		ansible-playbook -i hosts provision.yaml"
 

@@ -1,7 +1,6 @@
 .vagrant/
 .vagrantup
 files/
-aws-cred/
 utils/
 
 .rake_test_cache
@@ -15,3 +14,4 @@ utils/
 /keyrings/live/pubring.gpg~
 /keyrings/live/pubring.kbx~
 /keyrings/live/secring.gpg
+/aws-cred/credentials
