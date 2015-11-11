@@ -1,0 +1,9 @@
+[local]
+localhost
+
+[apptier]
+52.30.64.229
+52.17.144.48
+
+[webtier]
+52.31.151.18

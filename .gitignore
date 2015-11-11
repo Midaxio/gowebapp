@@ -1,7 +1,8 @@
 .vagrant/
 .vagrantup
-files/chefdk.deb
+files/
 aws-cred/
+utils/
 
 .rake_test_cache
 
