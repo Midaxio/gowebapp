@@ -1,1 +1,2 @@
+aws-creds/credentials
 keys/sainsburys-test
