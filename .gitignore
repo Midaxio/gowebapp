@@ -10,6 +10,7 @@ utils/
 ###
 .chef/*.pem
 .chef/encrypted_data_bag_secret
+vendor-cookbooks/
 
 /keyrings/live/pubring.gpg~
 /keyrings/live/pubring.kbx~
