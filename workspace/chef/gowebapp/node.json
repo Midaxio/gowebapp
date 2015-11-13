@@ -1,6 +1,6 @@
 {
 	"run_list": [
-        "recipe[nginx_proxy]"
+        "recipe[goapp]"
         ]
 }
 		

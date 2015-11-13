@@ -1,0 +1,7 @@
+source "https://supermarket.chef.io"
+
+cookbook 'nginx'
+cookbook 'apt'
+cookbook 'git'
+cookbook 'ssh_authorized_keys'
+cookbook 'sudo'
