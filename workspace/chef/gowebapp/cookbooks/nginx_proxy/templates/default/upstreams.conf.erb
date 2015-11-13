@@ -1,4 +1,4 @@
 upstream goapp {
-    server goapp1;
-    server goapp2;
+<% node['nginx_proxy']['appservers'].each do |appserver| %>
+    server <%= appserver %>;
 }

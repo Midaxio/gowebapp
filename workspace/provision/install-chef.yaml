@@ -2,7 +2,7 @@
 - hosts: all
   remote_user: ubuntu
   # connection: local
-  gather_facts: True
+  gather_facts: False
   vars_files:
   - group_vars/all
   tasks:
@@ -20,6 +20,7 @@
   - name: Get repo
     git: repo=https://github.com/urtens/gowebapp.git
          dest=/home/ubuntu/repo
+         force=true
 
   - name: Download cookbook depenencies
     shell: berks vendor vendor-cookbooks

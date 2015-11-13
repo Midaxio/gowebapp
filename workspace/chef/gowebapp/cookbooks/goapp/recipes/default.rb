@@ -40,14 +40,6 @@ directory app_path do
     group app_group
     recursive true
 end
-
-
-
-execute 'compile_app' do
-    command "GOBIN=#{gobin_path} golang-go install /home/ubuntu/app.go"
-    creates "#{gobin_path}/app"
-end
-
 service 'goapp' do
-    action :start
+    action :enable
 end
