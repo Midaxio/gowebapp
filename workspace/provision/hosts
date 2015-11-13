@@ -2,8 +2,12 @@
 localhost
 
 [apptier]
-52.30.64.229
-52.17.144.48
+52.18.12.198
+52.18.223.75
 
 [webtier]
-52.31.151.18
+52.30.78.32
+
+[remote:children]
+apptier
+webtier

@@ -24,6 +24,12 @@
           from_port: 80
           to_port: 80
           cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0
     register: webtier_sg
 
   - name: Create nginx proxy
@@ -55,6 +61,17 @@
           from_port: "{{ app_port }}"
           to_port: "{{ app_port }}"
           group_id: webtier_sg
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0
     register: apptier_sg
 
   - name: Create apptier nodes
