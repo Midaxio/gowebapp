@@ -1,2 +1,2 @@
 aws-cred/credentials
-keys/sainsburys-test
+keys/sainsburys-test.pem
