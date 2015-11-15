@@ -14,6 +14,7 @@ template '/etc/nginx/conf.d/upstreams.conf' do
     owner 'root'
     group 'root'
     mode '0640'
+    notifies :reload, "service[nginx]", :delayed
 end
 
 template '/etc/nginx/sites-available/gosite' do

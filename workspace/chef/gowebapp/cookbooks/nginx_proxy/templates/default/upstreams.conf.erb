@@ -1,5 +1,5 @@
 upstream goapp {
-<% node['nginx_proxy']['appservers'].each do |appserver| %>
+<% node['nginx_proxy']['appservers'].each do |appserver| -%>
     server <%= appserver %>;
 <% end %>
 }
