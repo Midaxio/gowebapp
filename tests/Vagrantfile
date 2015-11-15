@@ -1,0 +1,81 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+VM_PROXY_IP = '172.28.128.40'
+VM_PROXY_SSHPORT = '2201'
+VM_PROXY_PORT = '8888'
+VM_PROXY_MEMORY = '512'
+
+VM_APP_MEMORY = '512'
+VM_APP_PORT = '8484'
+
+VM_APP1_IP = '172.28.128.41'
+VM_APP1_SSHPORT = '2202'
+
+VM_APP2_IP = '172.28.128.42'
+VM_APP2_SSHPORT = '2203'
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.synced_folder "../workspace/chef/gowebapp", "/tmp/vagrant/chef"
+  config.vm.box_check_update = true
+
+  config.vm.define "app1" do |app1|
+    app1.vm.network "private_network", ip: VM_APP1_IP
+    app1.vm.network "forwarded_port", guest: 22, host: VM_APP1_SSHPORT, id: "ssh"
+    app1.vm.hostname = 'app1'
+    app1.vm.provider "virtualbox" do |v|
+      v.memory = VM_APP_MEMORY
+    end
+
+    app1.vm.box = "ubuntu/trusty64"
+    
+    app1.vm.provision "chef_solo" do |chef|
+        chef.cookbooks_path = ["../workspace/chef/gowebapp/cookbooks/", "../workspace/chef/gowebapp/vendor-cookbooks"]
+        chef.add_recipe "goapp"
+        chef.add_recipe "goapp::install"
+    end
+  end
+  
+  config.vm.define "app2" do |app2|
+    app2.vm.network "forwarded_port", guest: 22, host: VM_APP2_SSHPORT, id: "ssh"
+    app2.vm.network "private_network", ip: VM_APP2_IP
+    app2.vm.hostname = 'app2'
+    app2.vm.provider "virtualbox" do |v|
+      v.memory = VM_APP_MEMORY
+    end
+    app2.vm.box = "ubuntu/trusty64"
+
+    app2.vm.provision "chef_solo" do |chef|
+        chef.cookbooks_path = ["../workspace/chef/gowebapp/cookbooks/", "../workspace/chef/gowebapp/vendor-cookbooks"]
+        chef.add_recipe "goapp"
+        chef.add_recipe "goapp::install"
+    end
+  end
+
+  config.vm.define "proxy" do |proxy|
+    proxy.vm.network "forwarded_port", guest: 80, host: VM_PROXY_PORT
+    proxy.vm.network "forwarded_port", guest: 22, host: VM_PROXY_SSHPORT, id: "ssh"
+    proxy.vm.network "private_network", ip: VM_PROXY_IP
+    proxy.vm.hostname = 'proxy'
+
+    proxy.vm.provider "virtualbox" do |v|
+      v.memory = VM_PROXY_MEMORY
+    end
+
+    proxy.vm.box = "ubuntu/trusty64"
+    proxy.vm.provision "chef_solo" do |chef|
+        chef.cookbooks_path = ["../workspace/chef/gowebapp/cookbooks/", "../workspace/chef/gowebapp/vendor-cookbooks"]
+        chef.add_recipe "nginx_proxy"
+        chef.json = {
+            "nginx_proxy" => {
+                "appservers" => [
+                    "#{VM_APP1_IP}:#{VM_APP_PORT}",
+                    "#{VM_APP2_IP}:#{VM_APP_PORT}"
+                ]
+            }
+        }
+    end
+  end
+end
+
