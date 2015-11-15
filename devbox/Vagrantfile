@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.synced_folder "../workspace", "/home/vagrant/workspace",
     owner: "vagrant", group: "vagrant"
   
-  config.vm.synced_folder "aws-cred/", "/home/vagrant/.aws",
+  config.vm.synced_folder "../aws-cred/", "/home/vagrant/.aws",
     owner: "vagrant", group: "vagrant"
   
   config.vm.provision "file", source: "files/", destination: "/tmp/"

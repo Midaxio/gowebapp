@@ -16,3 +16,5 @@ vendor-cookbooks/
 /keyrings/live/pubring.kbx~
 /keyrings/live/secring.gpg
 /aws-cred/credentials
+**/credentials
+/keys/sainsburys-test.pem

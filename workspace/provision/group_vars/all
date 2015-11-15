@@ -1,5 +1,0 @@
-key_name: sainsburys-test
-aws_region: eu-west-1
-ami_id: ami-cd0fd6be
-instance_type: t1.micro
-app_port: 8484

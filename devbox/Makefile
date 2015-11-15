@@ -1,11 +1,10 @@
-OS = $(shell uname)
 ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 PATH := $(ROOT_DIR)/utils/blackbox:$(PATH)
 VAGRANT_DEFAULT_PROVIDER := virtualbox
 CHEFDK_URL := https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/14.04/x86_64/chefdk_0.10.0-1_amd64.deb
 BLACKBOX_URL := https://github.com/StackExchange/blackbox.git
 
-vagrantup: Vagrantfile .downloadchefdk .sshkey
+devbox: Vagrantfile .downloadchefdk .sshkey
 ifeq ("$(wildcard .vagrantup)","")
 	@echo Starting vagrant box
 	VAGRANT_DEFAULT_PROVIDER=$(VAGRANT_DEFAULT_PROVIDER) vagrant up && \
@@ -36,7 +35,7 @@ endif
 .sshkey: .downloadblackbox
 ifeq ("$(wildcard files/id_rsa)","")
 	@echo Moving ssh key
-	PATH=$(PATH); cp keys/sainsburys-test files/id_rsa
+	PATH=$(PATH); cp ../keys/sainsburys-test.pem files/id_rsa
 else
 	@echo Key already decrypted
 endif
@@ -48,13 +47,6 @@ ifeq ("$(wildcard aws-cred/credentials)","")
 else
 	@echo Files already decrypted
 endif
-
-ssh: vagrantup
-	vagrant ssh
-
-provision-ec2: vagrantup .decryptfiles
-	vagrant ssh -c "cd ~/workspace/provision && \
-		ansible-playbook -i hosts provision.yaml"
 
 clean: 
 	vagrant destroy -f && rm -f .vagrantup

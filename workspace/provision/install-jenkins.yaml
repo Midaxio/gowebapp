@@ -1,9 +1,0 @@
-
----
-- hosts: all
-  remote_user: ubuntu
-  # connection: local
-  gather_facts: True
-  vars_files:
-  - group_vars/all
-  tasks:
