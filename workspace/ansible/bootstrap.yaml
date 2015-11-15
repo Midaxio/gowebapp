@@ -1,0 +1,29 @@
+---
+- hosts: remote
+  remote_user: ubuntu
+  # connection: local
+  gather_facts: False
+  vars_files:
+  - group_vars/all
+  tasks:
+  - name: Download Chef-dk
+    get_url: url=https://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chefdk_0.10.0-1_amd64.deb dest=/tmp/chefdk_0.10.0-1_amd64.deb
+
+  - name: Install Chef deb
+    sudo: true
+    apt: deb=/tmp/chefdk_0.10.0-1_amd64.deb
+
+  - name: Install git
+    sudo: true
+    apt: name=git state=latest update_cache=yes
+
+  - name: Get repo
+    git: repo=https://github.com/urtens/gowebapp.git
+         dest=/home/ubuntu/repo
+         force=true
+
+  - name: Download cookbook depenencies
+    shell: berks vendor vendor-cookbooks
+    args:
+      chdir: /home/ubuntu/repo/workspace/chef/gowebapp
+      creates: vendor-cookbooks

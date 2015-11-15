@@ -1,0 +1,92 @@
+
+---
+#Create and config the VPC
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+  - group_vars/all
+  tasks:
+
+  - name: Create Security group for web tier
+    ec2_group:
+      name: "webtier_sg"
+      description: "Security group for the web tier"
+      region: "{{ aws_region }}"
+      rules:
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          type: http
+          from_port: 80
+          to_port: 80
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          type: http
+          from_port: 8080
+          to_port: 8080
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0
+    register: webtier_sg
+
+  - name: Create nginx proxy
+    ec2:
+      region: "{{ aws_region }}"
+      keypair: "{{ key_name }}"
+      instance_type: "t2.micro"
+      image: "{{ ami_id }}"
+      group: webtier_sg
+      wait: true
+      instance_tags: 
+        Name: 'nginx_instance'
+      exact_count: 1
+      count_tag: 
+        Name: 'nginx_instance'
+    register: webtier_nodes
+
+  - name: Create Security group for apptier
+    ec2_group:
+      name: "apptier_sg"
+      description: "Security group for the app tier"
+      region: "{{ aws_region }}"
+      rules:
+        - proto: tcp
+          type: http
+          from_port: "{{ app_port }}"
+          to_port: "{{ app_port }}"
+          group_id: webtier_sg
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0
+    register: apptier_sg
+
+  - name: Create apptier nodes
+    ec2:
+      region: "{{ aws_region }}"
+      keypair: "{{ key_name }}"
+      instance_type: "t2.micro"
+      image: "{{ ami_id }}"
+      group: apptier_sg
+      wait: true
+      instance_tags: 
+        Name: 'goapp_instance'
+      exact_count: 2
+      count_tag: 
+        Name: 'goapp_instance'
+    register: apptier_nodes
