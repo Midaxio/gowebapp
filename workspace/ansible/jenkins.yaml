@@ -1,0 +1,75 @@
+
+---
+- hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+  - group_vars/all
+  tasks:
+
+  - name: Create Security group for Jenkins
+    ec2_group:
+      name: "jenkins_sg"
+      description: "Security group for the Jenkins CI"
+      region: "{{ aws_region }}"
+      rules:
+        - proto: tcp
+          type: ssh
+          from_port: 22
+          to_port: 22
+          cidr_ip: 0.0.0.0/0
+        - proto: tcp
+          type: http
+          from_port: 8080
+          to_port: 8080
+          cidr_ip: 0.0.0.0/0
+      rules_egress:
+        - proto: all
+          type: all
+          from_port: 0
+          to_port: 65535
+          cidr_ip: 0.0.0.0/0
+    register: jenkins_sg
+
+  - name: Create Jenkins instance
+    ec2:
+      region: "{{ aws_region }}"
+      keypair: "{{ key_name }}"
+      instance_type: "t2.micro"
+      image: "{{ ami_id }}"
+      group: jenkins_sg
+      wait: true
+      instance_tags: 
+        Name: 'Jenkins'
+      exact_count: 1
+      count_tag: 
+        Name: 'Jenkins'
+    register: jenkins_instance
+  
+  - name: Create DNS entry for Jenkins
+    route53:
+      command: "create"
+      zone: "{{ dns_zone }}"
+      record: "jenkins.{{ dns_zone }}"
+      type: "A"
+      value: "{{ item.public_ip }}"
+      ttl: "7200"
+    with_items: jenkins_instance.tagged_instances
+  
+  - name: Wait for instance
+    wait_for: host={{item.public_dns_name}} port=22 delay=60 timeout=320 state=started
+    with_items: jenkins_instance.instances
+
+  - name: Download Docker installer
+    get_url: url=https://get.docker.com/index dest=/tmp/docker.sh validate_certs=false
+  
+  - name: Install Docker
+    sudo: true
+    shell: sh /tmp/docker.sh
+    args:
+      creates: /usr/bin/docker 
+
+  - name: Run Jenkins Container
+    sudo: true
+    shell: docker run -d --name myjenkins -p 8080:8080 -v /var/jenkins_home jenkins
+  
