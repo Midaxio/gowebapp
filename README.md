@@ -32,3 +32,5 @@ i.e.
 5 - Hi there, I'm served from ip-172-31-46-69!
 5 - Hi there, I'm served from ip-172-31-46-68!
 ```
+* Deploy new code
+It will happen automatically - just go to http://jenkins.dev.midax.io:8080/job/GoApp/view/Build%20Pipeline/
