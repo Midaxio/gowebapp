@@ -1,6 +1,5 @@
 
 ---
-#Create and config the VPC
 - hosts: localhost
   connection: local
   gather_facts: False
@@ -62,7 +61,7 @@
           type: http
           from_port: "{{ app_port }}"
           to_port: "{{ app_port }}"
-          group_id: webtier_sg
+          cidr_ip: "{{ vpc_cidr }}"
         - proto: tcp
           type: ssh
           from_port: 22
@@ -90,3 +89,23 @@
       count_tag: 
         Name: 'goapp_instance'
     register: apptier_nodes
+  
+  - name: Create DNS entry for proxy
+    route53:
+      command: "create"
+      zone: "{{ dns_zone }}"
+      record: "go.{{ dns_zone }}"
+      type: "A"
+      value: "{{ item.public_ip }}"
+      ttl: "7200"
+    with_items: webtier_nodes.tagged_instances
+  
+  - name: Create DNS entry for app servers
+    route53:
+      command: "create"
+      zone: "{{ dns_zone }}"
+      record: "app{{ item.0 + 1 }}.{{ dns_zone }}"
+      type: "A"
+      value: "{{ item.1.private_ip }}"
+      ttl: "7200"
+    with_indexed_items: apptier_nodes.tagged_instances
