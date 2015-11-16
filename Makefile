@@ -1,6 +1,6 @@
 SERVICE_URL := http://go.dev.midax.io/
 
-.PHONY: test
+.PHONY: test devbox
 
 devbox:
 	@cd devbox && $(MAKE) devbox 
