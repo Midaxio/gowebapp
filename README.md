@@ -26,3 +26,9 @@
 ```
     make test
 ```
+This will run curl twice showing each request served by a different app server.
+i.e.
+```
+5 - Hi there, I'm served from ip-172-31-46-69!
+5 - Hi there, I'm served from ip-172-31-46-68!
+```
